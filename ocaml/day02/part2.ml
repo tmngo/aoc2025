@@ -1,28 +1,22 @@
-let is_invalid x =
-  let ndigits = int_of_float (log10 (float_of_int x)) + 1 in
-  List.exists
-    (fun n ->
-      let seqs =
-        Array.init (ndigits / n) (fun k ->
-            x / Util.pow 10 (k * n) mod Util.pow 10 n)
-      in
-      (* let () =
-           Printf.printf "seqs: %i %s\n" n
-             (String.concat ", " (List.map string_of_int seqs))
-         in *)
-      (* match seqs with
-      | [||] -> truex
-      | x :: xs -> List.fold_left (fun acc elem -> elem = x && acc) true xs *)
-      let first = Array.get seqs 0 in
-      Array.for_all (fun x -> x = first) seqs)
-    (List.filter
-       (fun n -> ndigits mod n == 0)
-       (List.init (ndigits / 2) (fun x -> (ndigits / 2) - x)))
-;;
-
-(* 274.5 ms *)
+(* 99.3 ms *)
 Printf.printf "%i\n"
-  (Array.fold_left
+  (let is_invalid x =
+     let ndigits = int_of_float (log10 (float_of_int x)) + 1 in
+     List.exists
+       (fun n ->
+         let first = x mod Util.pow 10 n in
+         let rec check index =
+           if index * n >= ndigits then true
+           else
+             let bi = x / Util.pow 10 (index * n) mod Util.pow 10 n in
+             bi = first && check (index + 1)
+         in
+         check 1)
+       (List.filter
+          (fun n -> ndigits mod n == 0)
+          (List.init (ndigits / 2) (fun x -> (ndigits / 2) - x)))
+   in
+   Array.fold_left
      (fun count s ->
        let min, max =
          match String.split_on_char '-' s with
