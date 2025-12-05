@@ -9,26 +9,21 @@ Printf.printf "%i\n"
    let ranges =
      List.fold_left
        (fun acc (a, b) ->
-         let overlapping, rest =
-           List.partition (fun (ai, bi) -> ai <= b && bi >= a) acc
-         in
-         match overlapping with
-         | [] -> (a, b) :: rest
-         | _ ->
-             List.fold_left
-               (fun (amin, bmax) (ai, bi) -> (min ai amin, max bi bmax))
-               (a, b) overlapping
-             :: rest)
+         match acc with
+         | (ai, bi) :: rest when a <= bi + 1 -> (ai, max bi b) :: rest
+         | _ -> (a, b) :: acc)
        []
-       (List.map
-          (fun line ->
-            let min, max =
-              match String.split_on_char '-' line with
-              | a :: b :: _ -> (int_of_string a, int_of_string b)
-              | _ -> failwith "unreachable"
-            in
-            (min, max))
-          (List.take split_index lines))
+       (List.sort
+          (fun (a1, _) (a2, _) -> a1 - a2)
+          (List.map
+             (fun line ->
+               let min, max =
+                 match String.split_on_char '-' line with
+                 | a :: b :: _ -> (int_of_string a, int_of_string b)
+                 | _ -> failwith "unreachable"
+               in
+               (min, max))
+             (List.take split_index lines)))
    in
    (* let () =
      Printf.printf "frs: %s\n"
