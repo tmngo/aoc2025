@@ -1,6 +1,4 @@
 (* 3.9 ms *)
-module IntSet = Set.Make (Int);;
-
 Printf.printf "%i\n"
   (let lines = Util.read_lines "./day09/input" in
    let points =
