@@ -27,23 +27,17 @@ Printf.printf "%i\n"
          (indicator_lights, buttons))
        lines
    in
-   let rec check indicator_lights buttons idx selected =
-     if
-       indicator_lights
-       = List.fold_left (fun acc x -> acc lxor buttons.(x)) 0 selected
-     then
-       (* let () =
-         Printf.printf "[%s]\n"
-           (String.concat "," (List.map string_of_int selected))
-       in *)
-       List.length selected
+   let rec check indicator_lights buttons idx =
+     if indicator_lights = 0 then 0
      else if idx = Array.length buttons then 9999
      else
-       let a = check indicator_lights buttons (idx + 1) (idx :: selected) in
-       let b = check indicator_lights buttons (idx + 1) selected in
+       let a =
+         1 + check (indicator_lights lxor buttons.(idx)) buttons (idx + 1)
+       in
+       let b = check indicator_lights buttons (idx + 1) in
        min a b
    in
    List.fold_left
      (fun acc (indicator_lights, buttons) ->
-       acc + check indicator_lights buttons 0 [])
+       acc + check indicator_lights buttons 0)
      0 machines)
